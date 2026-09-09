@@ -4,9 +4,8 @@ Retrieval-Augmented Generation pipeline using FAISS + HuggingFace embeddings + O
 """
 
 import os
-import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 from dotenv import load_dotenv
 
 from langchain_community.vectorstores import FAISS
@@ -15,7 +14,7 @@ from langchain.schema import Document
 from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
@@ -57,7 +56,7 @@ Chat History:
 HUMAN_PROMPT = "{question}"
 
 
-def build_documents() -> list[Document]:
+def build_documents() -> List[Document]:
     """Convert SDG knowledge base entries to LangChain Documents."""
     docs = []
     for entry in SDG_DOCUMENTS:
@@ -145,7 +144,7 @@ class EcoAssistRAG:
         else:
             self.chain = None
 
-    def _mock_response(self, query: str, docs: list[Document]) -> dict:
+    def _mock_response(self, query: str, docs: List[Document]) -> dict:
         """Fallback response when no API key is available."""
         sources = [
             {"title": d.metadata.get("title", ""), "sdg": d.metadata.get("sdg", "")}
