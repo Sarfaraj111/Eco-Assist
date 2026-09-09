@@ -4,6 +4,7 @@ python-dotenv==1.0.1
 langchain==0.2.6
 langchain-community==0.2.6
 langchain-openai==0.1.13
+langchain-google-genai==1.0.10
 faiss-cpu==1.12.0
 openai==1.35.3
 pypdf==4.2.0
@@ -11,3 +12,4 @@ tiktoken==0.7.0
 pydantic==2.7.4
 httpx==0.27.0
 numpy>=1.24.0,<2.0.0
+google-generativeai==0.7.2

@@ -7,9 +7,9 @@ services:
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
       - key: MODEL_NAME
-        value: gpt-4o-mini
+        value: gemini-1.5-flash
       - key: PYTHON_VERSION
         value: 3.11.9

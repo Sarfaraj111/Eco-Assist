@@ -1,6 +1,6 @@
 """
 EcoAssist RAG Engine
-Retrieval-Augmented Generation pipeline using FAISS + OpenAI embeddings + OpenAI GPT
+Retrieval-Augmented Generation pipeline using FAISS + Google Gemini
 """
 
 import os
@@ -9,7 +9,7 @@ from typing import Optional, List
 from dotenv import load_dotenv
 
 from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.schema import Document
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
@@ -25,7 +25,7 @@ load_dotenv()
 # Constants
 # ──────────────────────────────────────────────
 VECTOR_STORE_PATH = Path(__file__).parent / "faiss_index"
-OPENAI_MODEL = os.getenv("MODEL_NAME", "gpt-4o-mini")
+GEMINI_MODEL = os.getenv("MODEL_NAME", "gemini-1.5-flash")
 
 
 SYSTEM_PROMPT = """You are EcoAssist 🌿, an expert AI assistant specializing in:
@@ -71,11 +71,11 @@ def build_documents() -> List[Document]:
     return docs
 
 
-def get_embeddings() -> OpenAIEmbeddings:
-    """Return OpenAI embeddings instance."""
-    return OpenAIEmbeddings(
-        model="text-embedding-3-small",
-        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+def get_embeddings() -> GoogleGenerativeAIEmbeddings:
+    """Return Google Gemini embeddings instance."""
+    return GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001",
+        google_api_key=os.getenv("GEMINI_API_KEY", ""),
     )
 
 
@@ -103,11 +103,11 @@ class EcoAssistRAG:
     """Main RAG assistant for EcoAssist."""
 
     def __init__(self):
-        api_key = os.getenv("OPENAI_API_KEY", "")
-        self._no_key = not api_key or api_key == "your_openai_api_key_here"
+        api_key = os.getenv("GEMINI_API_KEY", "")
+        self._no_key = not api_key or api_key == "your_gemini_api_key_here"
 
         if self._no_key:
-            print("WARNING: No valid OpenAI API key found. Using mock responses.")
+            print("WARNING: No valid Gemini API key found. Using mock responses.")
             self.vectorstore = None
             self.retriever = None
             self.llm = None
@@ -118,11 +118,11 @@ class EcoAssistRAG:
                 search_type="similarity",
                 search_kwargs={"k": 4}
             )
-            self.llm = ChatOpenAI(
-                model=OPENAI_MODEL,
+            self.llm = ChatGoogleGenerativeAI(
+                model=GEMINI_MODEL,
                 temperature=0.3,
-                openai_api_key=api_key,
-                max_tokens=1024,
+                google_api_key=api_key,
+                max_output_tokens=1024,
             )
             combine_docs_chain_kwargs = {
                 "prompt": ChatPromptTemplate.from_messages([
@@ -160,7 +160,7 @@ class EcoAssistRAG:
                 f"**Most relevant knowledge base entry:** {sources[0]['title'] if sources else 'N/A'} "
                 f"({sources[0]['sdg'] if sources else ''})\n\n"
                 f"{excerpt}...\n\n"
-                f"💡 **Eco Tip:** Set your `OPENAI_API_KEY` in `backend/.env` to get full AI-powered answers."
+                f"💡 **Eco Tip:** Set your `GEMINI_API_KEY` in Render environment variables to get full AI-powered answers."
             ),
             "sources": sources,
         }
