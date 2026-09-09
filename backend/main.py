@@ -62,29 +62,6 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
-@app.get("/debug/env")
-async def debug_env():
-    import os
-    key = os.getenv("OPENAI_API_KEY", "")
-    all_keys = [k for k in os.environ.keys() if "OPEN" in k.upper() or "API" in k.upper()]
-    return {
-        "has_key": bool(key),
-        "key_prefix": key[:7] if key else "none",
-        "key_length": len(key),
-        "related_env_keys": all_keys,
-    }
-
-@app.post("/debug/reset")
-async def debug_reset():
-    """Force re-initialize the RAG engine (picks up new env vars)."""
-    from rag import engine as eng
-    eng._rag_instance = None
-    new_instance = eng.get_rag_engine()
-    return {
-        "reinitialized": True,
-        "has_key": not new_instance._no_key,
-    }
-
 @app.post("/api/chat", response_model=QueryResponse)
 async def chat(request: QueryRequest):
     if not request.question.strip():
