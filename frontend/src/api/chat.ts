@@ -1,7 +1,11 @@
 import axios from 'axios'
 import type { ChatResponse } from '../types'
 
-const API_BASE = '/api'
+// In production (Vercel), VITE_API_URL is set to the Render backend URL.
+// In dev, the Vite proxy forwards /api → http://localhost:8000.
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api'
 
 export async function sendMessage(
   question: string,
