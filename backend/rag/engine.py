@@ -1,6 +1,6 @@
 """
 EcoAssist RAG Engine
-Retrieval-Augmented Generation pipeline using FAISS + HuggingFace embeddings + OpenAI GPT
+Retrieval-Augmented Generation pipeline using FAISS + OpenAI embeddings + OpenAI GPT
 """
 
 import os
@@ -9,9 +9,8 @@ from typing import Optional, List
 from dotenv import load_dotenv
 
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.schema import Document
-from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
@@ -26,7 +25,6 @@ load_dotenv()
 # Constants
 # ──────────────────────────────────────────────
 VECTOR_STORE_PATH = Path(__file__).parent / "faiss_index"
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 OPENAI_MODEL = os.getenv("MODEL_NAME", "gpt-4o-mini")
 
 
@@ -73,13 +71,17 @@ def build_documents() -> List[Document]:
     return docs
 
 
+def get_embeddings() -> OpenAIEmbeddings:
+    """Return OpenAI embeddings instance."""
+    return OpenAIEmbeddings(
+        model="text-embedding-3-small",
+        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+    )
+
+
 def get_or_create_vectorstore() -> FAISS:
     """Load existing FAISS index or build a new one from the knowledge base."""
-    embeddings = HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True}
-    )
+    embeddings = get_embeddings()
 
     if VECTOR_STORE_PATH.exists():
         print(f"Loading existing FAISS index from {VECTOR_STORE_PATH}")
@@ -108,7 +110,8 @@ class EcoAssistRAG:
         )
 
         api_key = os.getenv("OPENAI_API_KEY", "")
-        if not api_key or api_key == "your_openai_api_key_here":
+        self._no_key = not api_key or api_key == "your_openai_api_key_here"
+        if self._no_key:
             print("WARNING: No valid OpenAI API key found. Using mock responses.")
             self.llm = None
         else:
@@ -165,7 +168,11 @@ class EcoAssistRAG:
 
     def query(self, question: str, session_id: Optional[str] = None) -> dict:
         """Process a user query and return answer with sources."""
-        # Always retrieve relevant docs for source attribution
+        # If no API key, return mock without hitting embeddings
+        if self._no_key:
+            return self._mock_response(question, [])
+
+        # Retrieve relevant docs for source attribution
         retrieved_docs = self.retriever.invoke(question)
 
         if self.chain is None:

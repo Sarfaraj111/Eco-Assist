@@ -1,4 +1,4 @@
-﻿services:
+services:
   - type: web
     name: ecoassist-backend
     runtime: python
@@ -7,10 +7,8 @@
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: OPENAI_API_KEY
-        sync: false          # you set this manually in Render dashboard
+        sync: false
       - key: MODEL_NAME
         value: gpt-4o-mini
-      - key: EMBEDDING_MODEL
-        value: all-MiniLM-L6-v2
       - key: PYTHON_VERSION
         value: 3.11.0
