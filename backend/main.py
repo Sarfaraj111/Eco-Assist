@@ -62,6 +62,16 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+@app.get("/debug/env")
+async def debug_env():
+    import os
+    key = os.getenv("OPENAI_API_KEY", "")
+    return {
+        "has_key": bool(key),
+        "key_prefix": key[:7] if key else "none",
+        "key_length": len(key),
+    }
+
 @app.post("/api/chat", response_model=QueryResponse)
 async def chat(request: QueryRequest):
     if not request.question.strip():
