@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+}
+
+@layer components {
+  .prose-eco {
+    @apply prose prose-sm max-w-none
+      prose-headings:text-eco-800
+      prose-a:text-eco-600 prose-a:no-underline hover:prose-a:underline
+      prose-strong:text-gray-800
+      prose-code:bg-eco-50 prose-code:text-eco-800 prose-code:rounded prose-code:px-1
+      prose-ul:pl-5 prose-ol:pl-5
+      prose-li:my-0.5;
+  }
+
+  .sdg-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  .sdg-13 { @apply bg-green-100 text-green-800; }
+  .sdg-11 { @apply bg-amber-100 text-amber-800; }
+  .sdg-12 { @apply bg-yellow-100 text-yellow-800; }
+  .sdg-3  { @apply bg-teal-100 text-teal-800; }
+}

@@ -1,0 +1,31 @@
+﻿# ── Python ──────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv/
+venv/
+env/
+
+# FAISS index (auto-generated on first run)
+backend/rag/faiss_index/
+
+# ── Node / Frontend ──────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# ── Editor / OS ──────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+*.log
