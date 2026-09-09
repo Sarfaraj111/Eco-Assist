@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
@@ -74,7 +74,7 @@ def build_documents() -> List[Document]:
 def get_embeddings() -> GoogleGenerativeAIEmbeddings:
     """Return Google Gemini embeddings instance."""
     return GoogleGenerativeAIEmbeddings(
-        model="models/text-embedding-004",
+        model="text-embedding-004",
         google_api_key=os.getenv("GEMINI_API_KEY", ""),
     )
 
