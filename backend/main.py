@@ -62,6 +62,19 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+@app.get("/debug/test")
+async def debug_test():
+    import os, traceback
+    key = os.getenv("OPENAI_API_KEY", "")
+    if not key:
+        return {"error": "no api key"}
+    try:
+        from rag.engine import get_rag_engine
+        rag = get_rag_engine()
+        return {"status": "ok", "no_key": rag._no_key}
+    except Exception as e:
+        return {"error": str(e), "trace": traceback.format_exc()}
+
 @app.post("/api/chat", response_model=QueryResponse)
 async def chat(request: QueryRequest):
     if not request.question.strip():
