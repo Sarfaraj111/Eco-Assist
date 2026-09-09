@@ -74,7 +74,7 @@ def build_documents() -> List[Document]:
 def get_embeddings() -> GoogleGenerativeAIEmbeddings:
     """Return Google Gemini embeddings instance."""
     return GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",
+        model="models/text-embedding-004",
         google_api_key=os.getenv("GEMINI_API_KEY", ""),
     )
 
