@@ -11,4 +11,4 @@ services:
       - key: MODEL_NAME
         value: gpt-4o-mini
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.11.9
