@@ -103,33 +103,27 @@ class EcoAssistRAG:
     """Main RAG assistant for EcoAssist."""
 
     def __init__(self):
-        self.vectorstore = get_or_create_vectorstore()
-        self.retriever = self.vectorstore.as_retriever(
-            search_type="similarity",
-            search_kwargs={"k": 4}
-        )
-
         api_key = os.getenv("OPENAI_API_KEY", "")
         self._no_key = not api_key or api_key == "your_openai_api_key_here"
+
         if self._no_key:
             print("WARNING: No valid OpenAI API key found. Using mock responses.")
+            self.vectorstore = None
+            self.retriever = None
             self.llm = None
+            self.chain = None
         else:
+            self.vectorstore = get_or_create_vectorstore()
+            self.retriever = self.vectorstore.as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": 4}
+            )
             self.llm = ChatOpenAI(
                 model=OPENAI_MODEL,
                 temperature=0.3,
                 openai_api_key=api_key,
                 max_tokens=1024,
             )
-
-        self.memory = ConversationBufferWindowMemory(
-            memory_key="chat_history",
-            return_messages=True,
-            output_key="answer",
-            k=5  # keep last 5 exchanges
-        )
-
-        if self.llm:
             combine_docs_chain_kwargs = {
                 "prompt": ChatPromptTemplate.from_messages([
                     SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT),
@@ -144,8 +138,13 @@ class EcoAssistRAG:
                 combine_docs_chain_kwargs=combine_docs_chain_kwargs,
                 verbose=False,
             )
-        else:
-            self.chain = None
+
+        self.memory = ConversationBufferWindowMemory(
+            memory_key="chat_history",
+            return_messages=True,
+            output_key="answer",
+            k=5  # keep last 5 exchanges
+        )
 
     def _mock_response(self, query: str, docs: List[Document]) -> dict:
         """Fallback response when no API key is available."""
